@@ -1,25 +1,37 @@
-import React from 'react';
-import logo from './logo.svg';
 import './App.css';
+import { BrowserRouter, Switch, Route } from 'react-router-dom';
+import { Container } from 'reactstrap';
+import { Provider } from 'react-redux';
+import Router from './config/router';
+import Header from "./components/header";
+import { PersistGate } from 'redux-persist/integration/react';
+import { configurePersistor } from './config/redux/store';
 
-function App() {
+function App({ store }: any) {
+
+  const persistor = configurePersistor(store);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Provider store={store}>
+      <BrowserRouter>
+      <PersistGate persistor={persistor}>
+        <Container>
+          <Header/>
+          <Switch>
+            {Router.map((route, i) => {
+              return <Route key={i.toString()} component={route.component} path={route.path} exact />
+            })}
+            <Route
+              path="*"
+              component={() => {
+                return <div>404</div>;
+              }}
+            />
+          </Switch>
+        </Container>
+        </PersistGate>
+      </BrowserRouter>
+    </Provider>
   );
 }
 
